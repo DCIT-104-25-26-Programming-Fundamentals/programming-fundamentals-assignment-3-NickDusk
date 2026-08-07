@@ -1,0 +1,77 @@
+const readline = require('readline');
+
+async function partA() {
+    const rl = readline.createInterface({
+        input: process.stdin,
+        output: process.stdout
+    });
+
+    const n = parseInt(await new Promise(resolve => {
+        rl.question("How many terms? ", resolve);
+    }));
+    rl.close();
+
+    if (n <= 0) {
+        console.log("Error: N must be positive.");
+        return;
+    }
+
+    let fib;
+    if (n === 1) {
+        fib = [0];
+    } else if (n === 2) {
+        fib = [0, 1];
+    } else {
+        fib = [0, 1];
+        for (let i = 2; i < n; i++) {
+            fib.push(fib[fib.length - 1] + fib[fib.length - 2]);
+        }
+    }
+
+    console.log(`Fibonacci sequence: ${fib.slice(0, n).join(' ')}`);
+}
+
+async function partB() {
+    const rl = readline.createInterface({
+        input: process.stdin,
+        output: process.stdout
+    });
+
+    const num = parseInt(await new Promise(resolve => {
+        rl.question("Enter a number to check: ", resolve);
+    }));
+    rl.close();
+
+    let a = 0, b = 1;
+    while (a < num) {
+        [a, b] = [b, a + b];
+    }
+
+    if (a === num) {
+        console.log(`${num} is a Fibonacci number.`);
+    } else {
+        console.log(`${num} is NOT a Fibonacci number.`);
+    }
+}
+
+async function fibonacciMain() {
+    const rl = readline.createInterface({
+        input: process.stdin,
+        output: process.stdout
+    });
+
+    console.log("FIBONACCI SEQUENCE GENERATOR\n");
+    console.log("1. Print first N terms");
+    console.log("2. Check if a number is Fibonacci");
+
+    const choice = await new Promise(resolve => {
+        rl.question("\nEnter choice (1 or 2): ", resolve);
+    });
+    rl.close();
+
+    if (choice === '1') await partA();
+    else if (choice === '2') await partB();
+    else console.log("Invalid choice.");
+}
+
+if (require.main === module) fibonacciMain();
