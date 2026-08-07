@@ -1,0 +1,215 @@
+const readline = require('readline');
+
+async function readMatrix(rows, cols, name = "Matrix") {
+    const rl = readline.createInterface({
+        input: process.stdin,
+        output: process.stdout
+    });
+
+    const matrix = [];
+    console.log(`\nEnter ${name} (${rows} x ${cols}):`);
+
+    for (let i = 0; i < rows; i++) {
+        while (true) {
+            const rowInput = await new Promise(resolve => {
+                rl.question(`Row ${i+1}: `, resolve);
+            });
+            const parts = rowInput.trim().split(/\s+/);
+            if (parts.length === cols) {
+                const row = parts.map(parseFloat);
+                if (row.some(isNaN)) {
+                    console.log("Invalid input. Please enter numbers only.");
+                } else {
+                    matrix.push(row);
+                    break;
+                }
+            } else {
+                console.log(`Please enter exactly ${cols} numbers.`);
+            }
+        }
+    }
+    rl.close();
+    return matrix;
+}
+
+function printMatrix(matrix, title = "Matrix") {
+    if (!matrix || matrix.length === 0) {
+        console.log("Empty matrix");
+        return;
+    }
+    console.log(`\n${title}:`);
+    for (const row of matrix) {
+        const formattedRow = row.map(num => num.toFixed(2).padStart(8));
+        console.log(formattedRow.join(""));
+    }
+}
+
+function transposeMatrix(matrix) {
+    if (!matrix || matrix.length === 0) return [];
+    const rows = matrix.length;
+    const cols = matrix[0].length;
+    const transposed = [];
+    for (let j = 0; j < cols; j++) {
+        const newRow = [];
+        for (let i = 0; i < rows; i++) {
+            newRow.push(matrix[i][j]);
+        }
+        transposed.push(newRow);
+    }
+    return transposed;
+}
+
+function addMatrices(matrix1, matrix2) {
+    if (!matrix1 || !matrix2 || matrix1.length === 0) return [];
+    const rows = matrix1.length;
+    const cols = matrix1[0].length;
+    const result = [];
+    for (let i = 0; i < rows; i++) {
+        const newRow = [];
+        for (let j = 0; j < cols; j++) {
+            newRow.push(matrix1[i][j] + matrix2[i][j]);
+        }
+        result.push(newRow);
+    }
+    return result;
+}
+
+function multiplyMatrices(matrixA, matrixB) {
+    if (!matrixA || !matrixB || matrixA.length === 0) return [];
+    const m = matrixA.length;
+    const n = matrixA[0].length;
+    const p = matrixB[0].length;
+    const result = Array.from({ length: m }, () => Array(p).fill(0));
+    for (let i = 0; i < m; i++) {
+        for (let j = 0; j < p; j++) {
+            let total = 0;
+            for (let k = 0; k < n; k++) {
+                total += matrixA[i][k] * matrixB[k][j];
+            }
+            result[i][j] = total;
+        }
+    }
+    return result;
+}
+
+async function partA() {
+    const rl = readline.createInterface({
+        input: process.stdin,
+        output: process.stdout
+    });
+
+    console.log("\n" + "=".repeat(60));
+    console.log("PART A: Transpose a Matrix");
+    console.log("=".repeat(60));
+
+    const rows = parseInt(await new Promise(resolve => rl.question("Enter number of rows: ", resolve)));
+    const cols = parseInt(await new Promise(resolve => rl.question("Enter number of columns: ", resolve)));
+    rl.close();
+
+    const matrix = await readMatrix(rows, cols, "Original Matrix");
+    printMatrix(matrix, "Original Matrix");
+    const transposed = transposeMatrix(matrix);
+    printMatrix(transposed, "Transposed Matrix");
+}
+
+async function partB() {
+    const rl = readline.createInterface({
+        input: process.stdin,
+        output: process.stdout
+    });
+
+    console.log("\n" + "=".repeat(60));
+    console.log("PART B: Add Two Matrices");
+    console.log("=".repeat(60));
+
+    const rows = parseInt(await new Promise(resolve => rl.question("Enter number of rows: ", resolve)));
+    const cols = parseInt(await new Promise(resolve => rl.question("Enter number of columns: ", resolve)));
+    rl.close();
+
+    const matrix1 = await readMatrix(rows, cols, "Matrix A");
+    const matrix2 = await readMatrix(rows, cols, "Matrix B");
+    printMatrix(matrix1, "Matrix A");
+    printMatrix(matrix2, "Matrix B");
+    const result = addMatrices(matrix1, matrix2);
+    printMatrix(result, "Matrix A + Matrix B");
+}
+
+async function partC() {
+    const rl = readline.createInterface({
+        input: process.stdin,
+        output: process.stdout
+    });
+
+    console.log("\n" + "=".repeat(60));
+    console.log("PART C: Multiply Two Matrices");
+    console.log("=".repeat(60));
+
+    const m = parseInt(await new Promise(resolve => rl.question("Enter rows for Matrix A (M): ", resolve)));
+    const n = parseInt(await new Promise(resolve => rl.question("Enter columns for Matrix A (N): ", resolve)));
+    rl.close();
+
+    const matrixA = await readMatrix(m, n, "Matrix A");
+    console.log(`\nMatrix B must have ${n} rows (columns in A).`);
+    
+    const rl2 = readline.createInterface({
+        input: process.stdin,
+        output: process.stdout
+    });
+    const p = parseInt(await new Promise(resolve => rl2.question("Enter columns for Matrix B (P): ", resolve)));
+    rl2.close();
+
+    const matrixB = await readMatrix(n, p, "Matrix B");
+    printMatrix(matrixA, "Matrix A");
+    printMatrix(matrixB, "Matrix B");
+    const result = multiplyMatrices(matrixA, matrixB);
+    printMatrix(result, `Matrix A × Matrix B (${m} x ${p})`);
+}
+
+async function matrixMain() {
+    const rl = readline.createInterface({
+        input: process.stdin,
+        output: process.stdout
+    });
+
+    console.log("=".repeat(60));
+    console.log("MATRIX OPERATIONS PROGRAM");
+    console.log("=".repeat(60));
+    console.log("\nThis program performs three matrix operations:");
+    console.log("  A. Transpose a matrix");
+    console.log("  B. Add two matrices");
+    console.log("  C. Multiply two matrices");
+
+    while (true) {
+        console.log("\n" + "-".repeat(60));
+        console.log("Select an option:");
+        console.log("  1. Part A - Transpose");
+        console.log("  2. Part B - Addition");
+        console.log("  3. Part C - Multiplication");
+        console.log("  4. Run all parts");
+        console.log("  5. Exit");
+
+        const choice = await new Promise(resolve => {
+            rl.question("\nEnter your choice (1-5): ", resolve);
+        });
+
+        if (choice === '1') {
+            await partA();
+        } else if (choice === '2') {
+            await partB();
+        } else if (choice === '3') {
+            await partC();
+        } else if (choice === '4') {
+            await partA();
+            await partB();
+            await partC();
+        } else if (choice === '5') {
+            console.log("\nThank you for using the Matrix Operations Program!");
+            rl.close();
+            break;
+        } else {
+            console.log("Invalid choice. Please enter 1-5.");
+        }
+    }
+}
+
+if (require.main === module) matrixMain();
