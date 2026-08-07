@@ -1,0 +1,72 @@
+const readline = require('readline');
+
+async function partA() {
+    const rl = readline.createInterface({
+        input: process.stdin,
+        output: process.stdout
+    });
+
+    const num = parseInt(await new Promise(resolve => {
+        rl.question("Enter a number: ", resolve);
+    }));
+    rl.close();
+
+    if (isNaN(num)) {
+        console.log("Error: Please enter a valid integer.");
+        return;
+    }
+
+    console.log(`\nMultiplication Table for ${num}:`);
+    console.log("-".repeat(30));
+    for (let i = 1; i <= 12; i++) {
+        console.log(`${num} x ${i.toString().padStart(2)} = ${(num * i).toString().padStart(3)}`);
+    }
+}
+
+async function partB() {
+    const rl = readline.createInterface({
+        input: process.stdin,
+        output: process.stdout
+    });
+
+    const n = parseInt(await new Promise(resolve => {
+        rl.question("Enter a positive integer N: ", resolve);
+    }));
+    rl.close();
+
+    if (isNaN(n) || n <= 0) {
+        console.log("Error: N must be a positive integer.");
+        return;
+    }
+
+    for (let num = 1; num <= n; num++) {
+        console.log(`\nMultiplication Table for ${num}:`);
+        console.log("-".repeat(30));
+        for (let i = 1; i <= 12; i++) {
+            console.log(`${num} x ${i.toString().padStart(2)} = ${(num * i).toString().padStart(3)}`);
+        }
+        if (num < n) console.log("-".repeat(30));
+    }
+}
+
+async function multiplicationMain() {
+    const rl = readline.createInterface({
+        input: process.stdin,
+        output: process.stdout
+    });
+
+    console.log("MULTIPLICATION TABLE GENERATOR");
+    console.log("\n1. Single Table");
+    console.log("2. Tables from 1 to N");
+
+    const choice = await new Promise(resolve => {
+        rl.question("\nEnter choice (1 or 2): ", resolve);
+    });
+    rl.close();
+
+    if (choice === '1') await partA();
+    else if (choice === '2') await partB();
+    else console.log("Invalid choice.");
+}
+
+if (require.main === module) multiplicationMain();
