@@ -1,0 +1,43 @@
+const readline = require('readline');
+
+async function arrayOperations() {
+    const rl = readline.createInterface({
+        input: process.stdin,
+        output: process.stdout
+    });
+
+    const numbers = [];
+    console.log("Enter numbers (press Enter twice to finish):");
+
+    while (true) {
+        const input = await new Promise(resolve => rl.question('', resolve));
+        if (input.trim() === "") break;
+        const num = parseFloat(input);
+        if (isNaN(num)) {
+            console.log("Please enter a valid number.");
+        } else {
+            numbers.push(num);
+        }
+    }
+    rl.close();
+
+    if (numbers.length > 0) {
+        const total = numbers.reduce((a, b) => a + b, 0);
+        const maximum = Math.max(...numbers);
+        const minimum = Math.min(...numbers);
+        const average = total / numbers.length;
+
+        console.log("\n" + "=".repeat(30));
+        console.log("STATISTICAL RESULTS");
+        console.log("=".repeat(30));
+        console.log(`Sum:     ${total.toFixed(2)}`);
+        console.log(`Maximum: ${maximum.toFixed(2)}`);
+        console.log(`Minimum: ${minimum.toFixed(2)}`);
+        console.log(`Average: ${average.toFixed(2)}`);
+        console.log("=".repeat(30));
+    } else {
+        console.log("No numbers entered.");
+    }
+}
+
+if (require.main === module) arrayOperations();
