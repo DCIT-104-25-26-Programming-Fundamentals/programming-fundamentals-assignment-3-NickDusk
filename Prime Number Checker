@@ -1,0 +1,46 @@
+const readline = require('readline');
+
+function isPrime(n) {
+    if (n < 2) return false;
+    if (n === 2 || n === 3) return true;
+    if (n % 2 === 0 || n % 3 === 0) return false;
+    let i = 5;
+    while (i * i <= n) {
+        if (n % i === 0 || n % (i + 2) === 0) return false;
+        i += 6;
+    }
+    return true;
+}
+
+async function primeMain() {
+    const rl = readline.createInterface({
+        input: process.stdin,
+        output: process.stdout
+    });
+
+    console.log("\n" + "=".repeat(50));
+    console.log("  Prime number Checker made in Ghana");
+    console.log("=".repeat(50));
+
+    while (true) {
+        const input = await new Promise(resolve => {
+            rl.question("\nEnter a number (or 'quit' to exit): ", resolve);
+        });
+
+        if (['quit', 'exit', 'q'].includes(input.toLowerCase())) {
+            console.log("End, Thank you for using AJJNEX");
+            rl.close();
+            break;
+        }
+
+        const n = parseInt(input);
+        if (isNaN(n)) {
+            console.log("Please enter a valid integer or 'quit' or maybe you dont know integers go and try math 121 again");
+        } else {
+            const result = isPrime(n);
+            console.log(`${n} is ${result ? 'PRIME' : 'NOT PRIME'}`);
+        }
+    }
+}
+
+if (require.main === module) primeMain();
