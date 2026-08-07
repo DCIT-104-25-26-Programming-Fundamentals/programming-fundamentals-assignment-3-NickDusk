@@ -1,0 +1,87 @@
+const readline = require('readline');
+
+function addTask(tasks) {
+    const rl = readline.createInterface({
+        input: process.stdin,
+        output: process.stdout
+    });
+
+    return new Promise(resolve => {
+        rl.question("Enter task: ", (task) => {
+            tasks.push(task);
+            console.log(`Task added: "${task}"`);
+            rl.close();
+            resolve();
+        });
+    });
+}
+
+function viewTasks(tasks) {
+    if (tasks.length === 0) {
+        console.log("\nYour to-do list is empty.");
+    } else {
+        console.log("\nYour Tasks:");
+        tasks.forEach((task, i) => {
+            console.log(`${i+1}. ${task}`);
+        });
+    }
+}
+
+function deleteTask(tasks) {
+    const rl = readline.createInterface({
+        input: process.stdin,
+        output: process.stdout
+    });
+
+    return new Promise(resolve => {
+        if (tasks.length === 0) {
+            console.log("Nothing to delete.");
+            rl.close();
+            resolve();
+            return;
+        }
+
+        viewTasks(tasks);
+        rl.question("Enter task number to delete: ", (numInput) => {
+            const num = parseInt(numInput);
+            if (!isNaN(num) && num >= 1 && num <= tasks.length) {
+                const removed = tasks.splice(num-1, 1)[0];
+                console.log(`Task "${removed}" has been removed.`);
+            } else {
+                console.log("Invalid task number.");
+            }
+            rl.close();
+            resolve();
+        });
+    });
+}
+
+async function todoMain() {
+    const rl = readline.createInterface({
+        input: process.stdin,
+        output: process.stdout
+    });
+
+    const tasks = [];
+    console.log("TO-DO LIST\n");
+
+    while (true) {
+        console.log("\n1. Add  2. View  3. Delete  4. Quit");
+        const choice = await new Promise(resolve => {
+            rl.question("Choice: ", resolve);
+        });
+
+        if (choice === '1') await addTask(tasks);
+        else if (choice === '2') viewTasks(tasks);
+        else if (choice === '3') await deleteTask(tasks);
+        else if (choice === '4') {
+            console.log("Goodbye!");
+            rl.close();
+            break;
+        } else {
+            console.log("Invalid choice.");
+        }
+    }
+}
+
+if (require.main === module) todoMain();
