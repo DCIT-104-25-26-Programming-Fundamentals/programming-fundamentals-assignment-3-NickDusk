@@ -1,0 +1,151 @@
+const readline = require('readline');
+
+async function addStudent(students) {
+    const rl = readline.createInterface({
+        input: process.stdin,
+        output: process.stdout
+    });
+
+    const name = await new Promise(resolve => {
+        rl.question("Student name: ", resolve);
+    });
+    if (!name.trim()) {
+        console.log("Error: Name cannot be empty.");
+        rl.close();
+        return;
+    }
+
+    const sidInput = await new Promise(resolve => {
+        rl.question("Student ID: ", resolve);
+    });
+    const sid = parseInt(sidInput);
+    if (isNaN(sid)) {
+        console.log("Error: ID must be a number.");
+        rl.close();
+        return;
+    }
+    if (students.some(s => s.id === sid)) {
+        console.log(`Error: ID ${sid} already exists.`);
+        rl.close();
+        return;
+    }
+
+    const nInput = await new Promise(resolve => {
+        rl.question("How many scores? ", resolve);
+    });
+    const n = parseInt(nInput);
+    if (isNaN(n)) {
+        console.log("Error: Invalid input.");
+        rl.close();
+        return;
+    }
+
+    const scores = [];
+    let valid = true;
+    for (let i = 0; i < n; i++) {
+        const scoreInput = await new Promise(resolve => {
+            rl.question(`Score ${i+1}: `, resolve);
+        });
+        const score = parseFloat(scoreInput);
+        if (isNaN(score) || score < 0 || score > 100) {
+            console.log("Error: Scores must be between 0 and 100.");
+            valid = false;
+            break;
+        }
+        scores.push(score);
+    }
+    rl.close();
+
+    if (!valid) return;
+
+    students.push({ name: name.trim(), id: sid, scores });
+    console.log(`Student "${name.trim()}" added successfully.`);
+}
+
+function displayStudents(students) {
+    if (students.length === 0) {
+        console.log("\nNo students added yet.");
+        return;
+    }
+    console.log("\n" + "-".repeat(65));
+    console.log(`${'Name'.padEnd(20)} ${'ID'.padEnd(12)} ${'Scores'.padEnd(20)} ${'Avg'.padEnd(10)}`);
+    console.log("-".repeat(65));
+    for (const s of students) {
+        const avg = s.scores.length > 0 ? s.scores.reduce((a, b) => a + b, 0) / s.scores.length : 0;
+        const scoresStr = s.scores.join(", ");
+        console.log(`${s.name.slice(0, 18).padEnd(20)} ${String(s.id).padEnd(12)} ${scoresStr.slice(0, 18).padEnd(20)} ${avg.toFixed(2).padStart(6)}`);
+    }
+    console.log("-".repeat(65));
+}
+
+async function calcAverage(students) {
+    if (students.length === 0) {
+        console.log("\nNo students added yet.");
+        return;
+    }
+
+    const rl = readline.createInterface({
+        input: process.stdin,
+        output: process.stdout
+    });
+
+    const sidInput = await new Promise(resolve => {
+        rl.question("Enter student ID: ", resolve);
+    });
+    rl.close();
+
+    const sid = parseInt(sidInput);
+    if (isNaN(sid)) {
+        console.log("Error: Invalid ID.");
+        return;
+    }
+
+    const student = students.find(s => s.id === sid);
+    if (!student) {
+        console.log(`Error: ID ${sid} not found.`);
+        return;
+    }
+
+    const avg = student.scores.length > 0 ? student.scores.reduce((a, b) => a + b, 0) / student.scores.length : 0;
+    console.log(`\n${student.name}'s average: ${avg.toFixed(2)}`);
+    console.log(`Scores: ${student.scores.join(', ')}`);
+}
+
+async function studentRecordsMain() {
+    const rl = readline.createInterface({
+        input: process.stdin,
+        output: process.stdout
+    });
+
+    const students = [];
+    while (true) {
+        console.log("\n" + "=".repeat(30));
+        console.log("   STUDENT RECORD MENU");
+        console.log("=".repeat(30));
+        console.log("1. Add student");
+        console.log("2. Display all");
+        console.log("3. Calculate average");
+        console.log("4. Quit");
+        console.log("=".repeat(30));
+
+        const choice = await new Promise(resolve => {
+            rl.question("Enter choice (1-4): ", resolve);
+        });
+
+        if (choice === '1') {
+            await addStudent(students);
+        } else if (choice === '2') {
+            displayStudents(students);
+        } else if (choice === '3') {
+            await calcAverage(students);
+        } else if (choice === '4') {
+            console.log("\nGoodbye!");
+            rl.close();
+            break;
+        } else {
+            console.log("Invalid choice.");
+        }
+    }
+}
+
+if (require.main === module) studentRecordsMain();
