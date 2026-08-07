@@ -1,0 +1,35 @@
+const readline = require('readline');
+
+async function studentGrade() {
+    const rl = readline.createInterface({
+        input: process.stdin,
+        output: process.stdout
+    });
+
+    try {
+        const input = await new Promise(resolve => {
+            rl.question("Enter Student's Exam score: ", resolve);
+        });
+        rl.close();
+
+        const score = parseFloat(input);
+        if (isNaN(score)) {
+            console.log("Error: Please enter a valid number.");
+            return;
+        }
+
+        let grade;
+        if (score >= 80) grade = 'A';
+        else if (score >= 70) grade = 'B';
+        else if (score >= 60) grade = 'C';
+        else if (score >= 50) grade = 'D';
+        else grade = 'F';
+
+        console.log(`\nScore: ${score}`);
+        console.log(`Grade: ${grade}`);
+    } catch (error) {
+        console.log("Error: Please enter a valid number.");
+    }
+}
+
+if (require.main === module) studentGrade();
